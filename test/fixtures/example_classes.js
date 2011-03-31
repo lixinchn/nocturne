@@ -16,6 +16,10 @@ var User = nocturne.Class({
 
 	login: function(){
 		return true;
+	},
+
+	toString: function(){
+		return "name: " + this.name + ", age: " + this.age;
 	}
 });
 
@@ -50,5 +54,15 @@ var DoubleMixinUser = nocturne.Class({
 
 	initialize: function(log){
 		this.log = log;
+	}
+});
+
+var SuperUser = nocturne.Class(User, {
+	initialize: function(){
+		this.super('initialize', arguments);
+	},
+
+	toString: function(){
+		return "SuperUser: " + this.super('toString');
 	}
 });

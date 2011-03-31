@@ -7,6 +7,9 @@ nocturne.oo = {
 		var methods = null,
 			parent = undefined,
 			klass = function(){
+				this.super = function(method, args){
+					return nocturne.oo.super(this.$parent, this, method, args);
+				};
 				this.initialize.apply(this, arguments);
 			};
 
@@ -19,6 +22,7 @@ nocturne.oo = {
 
 		if (typeof parent !== 'undefined'){
 			nocturne.oo.extend(klass.prototype, parent.prototype);
+			klass.prototype.$parent = parent.prototype;
 		}
 
 		nocturne.oo.mixin(klass, methods);
@@ -49,5 +53,9 @@ nocturne.oo = {
 			destination[property] = source[property];
 		}
 		return destination;
+	},
+
+	super: function(parentClass, instance, method, args){
+		return parentClass[method].apply(instance, args);
 	}
 };

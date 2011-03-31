@@ -1,7 +1,7 @@
 (function(global){
 	var nocturne = {
-		VERSION: '0.0.2',
-		lesson: 'Part 1 : Object Oriented Programing'
+		VERSION: '0.0.4',
+		lesson: 'Part 4 : Function Programming'
 	};
 
 	if (global.nocturne){
