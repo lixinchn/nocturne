@@ -1,5 +1,7 @@
 load('riot.js');
 Riot.require('../nocturne.core.js');
+Riot.require('../nocturne.oo.js');
+Riot.require('../nocturne.functional.js');
 Riot.require('../nocturne.enumerable.js');
 
 Riot.context('nocturne.enumerable.js', function(){
@@ -24,6 +26,26 @@ Riot.context('nocturne.enumerable.js', function(){
 				return n % 2 == 0;
 			});
 		}).equals([2, 4]);
+
+		should('find values with detect', function(){
+			return nocturne.enumerable.detect(a, function(n){
+				return n == 1;
+			});
+		});
+
+		should('not find values with detect that do not exist', function(){
+			return typeof nocturne.enumerable.detect(a, function(n){
+				return n == 1000;
+			}) === 'undefined';
+		});
+
+		should('chain method calls', function(){
+			return nocturne.enumerable.chain([1, 2, 3, 4]).filter(function(n){
+				return n % 2 == 0;
+			}).map(function(n){
+				return n * 10;
+			}).values();
+		}).equals([20, 40]);
 	});
 
 	given('an object', function(){
