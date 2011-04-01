@@ -55,7 +55,44 @@ nocturne.enumerable = {
 		});
 
 		return results;
+	},
+
+	detect: function(enumerable, callback, context){
+		var result;
+		nocturne.enumerable.each(enumerable, function(value, index, list){
+			if (callback.call(context, value, index, list)){
+				result = value;
+				throw nocturne.enumerable.Break;
+			}
+		});
+		return result;
+	},
+
+	chain: function(enumerable){
+		return new nocturne.enumerable.Chainer(enumerable);
 	}
 };
 
+//Alias
 nocturne.enumerable.select = nocturne.enumerable.filter;
+
+//Chainer class
+nocturne.enumerable.Chainer = nocturne.Class({
+	initialize: function(values){
+		this.results = values;
+	},
+
+	values: function(){
+		return this.results;
+	}
+});
+
+nocturne.enumerable.each(['map', 'detect', 'filter'], function(methodName){
+	var method = nocturne.enumerable[methodName];
+	nocturne.enumerable.Chainer.prototype[methodName] = function(){
+		var args = Array.prototype.slice.call(arguments);
+		args.unshift(this.results);
+		this.results = method.apply(this, args);
+		return this;
+	}
+});
