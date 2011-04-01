@@ -59,10 +59,10 @@ var DoubleMixinUser = nocturne.Class({
 
 var SuperUser = nocturne.Class(User, {
 	initialize: function(){
-		this.super('initialize', arguments);
+		this.$super('initialize', arguments);
 	},
 
 	toString: function(){
-		return "SuperUser: " + this.super('toString');
+		return "SuperUser: " + this.$super('toString');
 	}
 });
