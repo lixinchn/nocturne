@@ -88,6 +88,22 @@ Riot.context('nocturne.enumerable.js', function(){
 				return value === 3;
 			});
 		}).isTrue();
+
+		should('check callback returns true for every item with all', function(){
+			return nocturne.enumerable.all([1, 2, 3], function(value){
+				return value < 4;
+			});
+		}).isTrue();
+
+		should('check callback returns false all when callback return false', function(){
+			return nocturne.enumerable.all([1, 2, 3], function(value){
+				return value > 4;
+			});
+		}).isFalse();
+
+		should('find values with include', function(){
+			return nocturne.enumerable.include([1, 2, 3], 3);
+		}).isTrue();
 	});
 
 	given('an object', function(){
@@ -111,6 +127,16 @@ Riot.context('nocturne.enumerable.js', function(){
 				return v < 2;
 			})[0][0];
 		}).equals('one');
+
+		should('check callback returns false with all when callback returns false', function(){
+			return nocturne.enumerable.all(obj, function(value, key){
+				return value > 4;
+			});
+		}).isFalse();
+
+		should('find values with include', function(){
+			return nocturne.enumerable.include(obj, '3');
+		}).isTrue();
 	});
 });
 

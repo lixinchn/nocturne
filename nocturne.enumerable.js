@@ -122,7 +122,34 @@ nocturne.enumerable = {
 
 	identity: function(value){
 		return value;
-	}
+	},
+
+	all: function(enumerable, callback, context){
+		callback = callback || nocturne.enumerable.identity;
+		if (Array.prototype.every && enumerable.every === Array.prototype.every){
+			return enumerable.every(callback, context);
+		}
+		var result = true;
+		nocturne.enumerable.each(enumerable, function(value, index, list){
+			if (!(result = result && callback.call(context, value, index, list))){
+				throw nocturne.enumerable.Break;
+			}
+		});
+		return result;
+	},
+
+	include: function(enumerable, target){
+		if (Array.prototype.indexOf && enumerable.indexOf === Array.prototype.indexOf){
+			return enumerable.indexOf(target) != -1;
+		}
+		var found = false;
+		nocturne.enumerable.each(enumerable, function(value, key){
+			if (found = value === target){
+				throw nocturne.enumerable.Break;
+			}
+		});
+		return found;
+	},
 };
 
 //Alias
@@ -131,6 +158,7 @@ nocturne.enumerable.inject = nocturne.enumerable.reduce;
 nocturne.enumerable.collect = nocturne.enumerable.map;
 nocturne.enumerable.rest = nocturne.enumerable.tail;
 nocturne.enumerable.any = nocturne.enumerable.some;
+nocturne.enumerable.every = nocturne.enumerable.all;
 nocturne.chainableMethods = ['map', 'collect', 'detect', 'filter', 'reduce', 'tail', 'rest', 'reject', 'pluck', 'any', 'some'];
 
 
