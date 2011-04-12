@@ -46,6 +46,12 @@ Riot.context('nocturne.enumerable.js', function(){
 				return n * 10;
 			}).values();
 		}).equals([20, 40]);
+
+		should('accumulate results with reduce', function(){
+			return nocturne.enumerable.reduce([1, 2, 3], 0, function(memo, n){
+				return memo + n;
+			});
+		}).equals(6);
 	});
 
 	given('an object', function(){

@@ -12,6 +12,15 @@
 		return (object === +object) || (toString.call(object) === '[object Number]');
 	}
 
+	nocturne.bind = function(fn, object){
+		var slice = Array.prototype.slice,
+			args = slice.apply(arguments, [2]);
+
+		return function(){
+			return fn.apply(object || {}, args.concat(slice.apply(arguments)));
+		};
+	}
+
 	if (global.nocturne){
 		throw new Error('nocturne has already been defined');
 	}else {

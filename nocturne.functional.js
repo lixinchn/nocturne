@@ -1,12 +1,5 @@
 nocturne.functional = {
-	curry: function(fn){
-		var slice = Array.prototype.slice,
-			args = slice.apply(arguments, [1]);
-
-		return function(){
-			return fn.apply(null, args.concat(slice.apply(arguments)));
-		};
-	},
+	curry: nocturne.bind,
 
 	memorize: function(memo, fn){
 		var wrapper = function(n){

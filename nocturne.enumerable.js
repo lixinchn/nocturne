@@ -57,6 +57,16 @@ nocturne.enumerable = {
 		return results;
 	},
 
+	reduce: function(enumerable, memo, callback, context){
+		if (Array.prototype.reduce && enumerable.reduce === Array.prototype.reduce){
+			return enumerable.reduce(nocturne.bind(callback, context), memo);
+		}
+		nocturne.enumerable.each(enumerable, function(value, index, list){
+			memo = callback.call(context, memo, value, index, list);
+		});
+		return memo;
+	},
+
 	detect: function(enumerable, callback, context){
 		var result;
 		nocturne.enumerable.each(enumerable, function(value, index, list){
@@ -75,6 +85,7 @@ nocturne.enumerable = {
 
 //Alias
 nocturne.enumerable.select = nocturne.enumerable.filter;
+nocturne.enumerable.inject = nocturne.enumerable.reduce;
 
 //Chainer class
 nocturne.enumerable.Chainer = nocturne.Class({
@@ -87,7 +98,7 @@ nocturne.enumerable.Chainer = nocturne.Class({
 	}
 });
 
-nocturne.enumerable.each(['map', 'detect', 'filter'], function(methodName){
+nocturne.enumerable.each(['map', 'detect', 'filter', 'reduce'], function(methodName){
 	var method = nocturne.enumerable[methodName];
 	nocturne.enumerable.Chainer.prototype[methodName] = function(){
 		var args = Array.prototype.slice.call(arguments);
