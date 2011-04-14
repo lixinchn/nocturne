@@ -73,6 +73,16 @@ nocturne.enumerable = {
 		return memo;
 	},
 
+	flatten: function(array){
+		return nocturne.enumerable.reduce(array, [], function(memo, value){
+			if (nocturne.isArray(value)){
+				return memo.concat(nocturne.enumerable.flatten(value));
+			}
+			memo.push(value);
+			return memo;
+		});
+	},
+
 	tail: function(enumerable, start){
 		start = typeof start === 'undefined' ? 1: start;
 		return Array.prototype.slice.apply(enumerable, [start]);

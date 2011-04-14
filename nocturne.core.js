@@ -1,7 +1,7 @@
 (function(global){
 	var nocturne = {
-		VERSION: '0.0.5',
-		lesson: 'Part 4 : Function Programming 2'
+		VERSION: '0.0.6',
+		lesson: 'Part 6: Selectors'
 	};
 
 	nocturne.isArray = Array.isArray || function(object){
