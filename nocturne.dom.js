@@ -79,7 +79,10 @@
 		return joinPatterns(
 			convertPatterns(convertPatterns(macros), rules)
 		);
+
 	}
+
+	scannerRegExp = scanner();
 
 	find = {
 		byId: function(root, id){
@@ -230,6 +233,10 @@
 		return this.results;
 	};
 
+	/*
+	 * remove spaces at the front and end.
+	 * then replace \n\t\r\f to a single space
+	 */
 	function normalize(text){
 		return text.replace(/^\s+|\s+$/g, '').replace(/[ \t\r\n\f]+/g, ' ');
 	}
@@ -249,10 +256,12 @@
 		this.tokens = [];
 		this.tokenize();
 	}
+
+	//Analize this.selector, give it a classification. eg: 'id' or 'name and id'
 	Tokenizer.prototype.tokenize = function(){
 		var match, r, finder;
 
-		r= scannerRegExp;
+		r = scannerRegExp;
 		r.lastIndex = 0;
 
 		while (match = r.exec(this.selector)){
@@ -283,11 +292,12 @@
 	};
 
 	dom.tokenize = function(selector){
-		var tokenizer = new Tokenizer(selector);
+		var tokenizer = new Tokenizer(selector); //one example of selector: .link
 		return tokenizer;
 	};
 
 	dom.get = function(selector){
+		//you give id or class etc. Search will give you dom elements you specified.
 		var tokens = dom.tokenize(selector).tokens,
 			searcher = new Searcher(document, tokens);
 
