@@ -39,8 +39,18 @@ Riot.context('nocturne.events.js', function(){
 
 			nocturne.events.add(document, 'click', callback);
 			nocturne.events.fire(nocturne.dom.get('.clickme')[0], 'click');
+			nocturne.events.remove(document, 'click', callback);
 			return lastResult;
 		}).equals('Text');
+
+		should('stop', function(){
+			var callback = function(event){
+				event.stop();
+			};
+			nocturne.events.add(nocturne.dom.get('#link2')[0], 'click', callback);
+			nocturne.events.fire(nocturne.dom.get('#link2')[0], 'click');
+			return window.location.hash;
+		}).equals('');
 	});
 });
 Riot.run();
