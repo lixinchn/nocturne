@@ -161,7 +161,7 @@
 	matchMap = {
 		'id': function(element, selector){
 			selector = selector.split('#')[1];
-			return element.id === selector;
+			return element && element.id === selector;
 		},
 
 		'name': function(element, nodeName){
