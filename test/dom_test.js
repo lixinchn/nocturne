@@ -16,6 +16,8 @@ Riot.context('nocturne.dom.js', function(){
 		should('find a link', nocturne.dom.get('#dom-test a.link')[0].innerHTML).equals('Example Link');
 		should('find a class name by itself', nocturne.dom.get('.example1')[0].nodeName).equals('DIV');
 		should('find a nested link', nocturne.dom.get('div#dom-test div p a.link')[0].innerHTML).equals('Example Link');
+		should('find a nested tag', nocturne.dom.get('.example3 p')[0].innerHTML).equals('Text');
+		should('find a nested tag', nocturne.dom.get('.example3 p').length).equals(1);
 	});
 
 	given('a selector that does not match anything', function(){
