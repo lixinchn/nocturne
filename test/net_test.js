@@ -11,6 +11,10 @@ Riot.context('nocturne.net.js', function(){
 
 		should ('generate a request object', request.readyState).isEqual(0);
 	});
+
+	given('a jsonp request', function(){
+		nocturne.net.jsonp('http://feeds.delicious.com/v1/json/alex_young/javascript?callback={callback}', {success: function(json){}});
+	});
 });
 
 Riot.run();
