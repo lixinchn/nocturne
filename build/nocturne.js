@@ -1,16 +1,17 @@
 (function(global){
 	var nocturne = {
-		VERSION: '0.0.7',
-		lesson: 'Part 7: Events'
+		VERSION: '0.0.10',
+		lesson: 'Part 10: Animation',
+		alias: '$n'
 	};
 
 	nocturne.isArray = Array.isArray || function(object){
 		return !!(object && object.concat && object.unshift && !object.callee);
-	}
+	};
 
 	nocturne.isNumber = function(object){
 		return (object === +object) || (toString.call(object) === '[object Number]');
-	}
+	};
 
 	nocturne.bind = function(fn, object){
 		var slice = Array.prototype.slice,
@@ -19,7 +20,7 @@
 		return function(){
 			return fn.apply(object || {}, args.concat(slice.apply(arguments)));
 		};
-	}
+	};
 
 	if (global.nocturne){
 		throw new Error('nocturne has already been defined');
@@ -751,30 +752,28 @@ nocturne.functional = {
 		});
 	}
 })();
-nocturne.aliasFramework = function(){
-	var alias = function(){
-		if (typeof arguments[0] === 'string' && nocturne.dom){
+(function(){
+	nocturne.aliasFramework = function(){
+		var alias = function(){
 			return nocturne.dom.get(arguments[0]);
-		}else {
-			return nocturne;
 		}
-	}
 
-	if (nocturne.enumerable){
-		nocturne.enumerable.each(nocturne.enumerable, function(fn, method){
-			alias[method] = fn;
-		});
-	}
+		if (nocturne.enumerable){
+			nocturne.enumerable.each(nocturne.enumerable, function(fn, method){
+				alias[method] = fn;
+			});
+		}
 
-	if (nocturne.dom){
-		alias.dom = nocturne.dom;
-	}
+		if (nocturne.dom){
+			alias.dom = nocturne.dom;
+		}
 
-	if (nocturne.events){
-		alias.events = nocturne.events;
-	}
+		if (nocturne.events){
+			alias.events = nocturne.events;
+		}
 
-	return alias;
-};
+		return alias;
+	};
 
-$n = nocturne.aliasFramework();
+	eval(nocturne.alias + ' = nocturne.aliasFramework()');
+})();
