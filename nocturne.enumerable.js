@@ -173,15 +173,13 @@ nocturne.chainableMethods = ['map', 'collect', 'detect', 'filter', 'reduce', 'ta
 
 
 //Chainer class
-nocturne.enumerable.Chainer = nocturne.Class({
-	initialize: function(values){
-		this.results = values;
-	},
+nocturne.enumerable.Chainer = function(values){
+	this.results = values;
+};
 
-	values: function(){
-		return this.results;
-	}
-});
+nocturne.enumerable.Chainer.prototype.values = function(){
+	return this.results;
+};
 
 nocturne.enumerable.each(nocturne.chainableMethods, function(methodName){
 	var method = nocturne.enumerable[methodName];

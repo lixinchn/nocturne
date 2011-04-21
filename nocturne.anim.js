@@ -1,6 +1,7 @@
 (function() {
   var anim = {},
       easing = {},
+	  Chainer,
       opacityType = (typeof document.body.style.opacity !== 'undefined') ? 'opacity' : 'filter';
 
   // These CSS related functions should be moved into nocturne.css
@@ -236,7 +237,7 @@
   };
 
   anim.highlight = function(element, duration, options) {
-    var style = a = element.currentStyle ? element.currentStyle : getComputedStyle(element, null);
+    var style = element.currentStyle ? element.currentStyle : getComputedStyle(element, null);
     options = options || {};
     options.from = options.from || '#ff9';
     options.to = options.to || style.backgroundColor;
@@ -248,9 +249,43 @@
     }, 200);
   };
 
-  anim.parseColor = function(colorString) { return new Color(colorString); };
+  anim.move = function(element, duration, options){
+	  return anim.animate(element, duration, {'left': options.x, 'top': options.y, 'easing': options.easing || easing.sine});
+  };
+
+  anim.parseColor = function(colorString){
+	  return new Color(colorString);
+  };
+
+  anim.pause = function(element, duration, options){};
 
   anim.easing = easing;
+
+
+  Chainer = function(element){
+	  this.element = element;
+	  this.position = 0;
+  };
+
+  for (methodName in anim){
+	  (function(method){
+		  var method = anim[methodName];
+		  Chainer.prototype[methodName] = function(){
+			  var args = Array.prototype.slice.call(arguments);
+			  args.unshift(this.element);
+			  this.position += args[1] || 0;
+			  setTimeout(function(){
+				  method.apply(null, args);
+			  }, this.position);
+			  return this;
+		  };
+	  })(methodName);
+  }
+  
+  anim.chain = function(element){
+	  return new Chainer(element);
+  };
+
   nocturne.anim = anim;
 })();
 
