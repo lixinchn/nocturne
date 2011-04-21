@@ -6,7 +6,8 @@ var jake = require('jake'),
 jake.task('concat', function(t){
 	var output = '',
 		files = ('nocturne.core.js nocturne.oo.js nocturne.enumerable.js '
-			+ 'nocturne.functional.js nocturne.dom.js nocturne.events.js nocturne.alias.js').split(' ')
+			+ 'nocturne.functional.js nocturne.dom.js nocturne.events.js ' 
+			+ 'nocturne.alias.js nocturne.anim.js').split(' ')
 
 		files.map(function(file){
 			output += FILE.read(file)
