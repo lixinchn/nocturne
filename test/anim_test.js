@@ -3,9 +3,22 @@ Riot.require('../nocturne.anim.js');
 
 Riot.context('nocturne.anim.js', function(){
 	given('a box to change', function(){
-		var box = document.getElementById('box');
-		//nocturne.anim.animate(box, 1000, {'marginLeft': '8em', 'marginTop': '100px'}, {easing: function(p){return p * 2.5}});
-		nocturne.anim.fadeOut(box, 1000);
+		nocturne.anim.highlight(document.getElementById('test-results'));
+	});
+
+	given('a long hex color', function(){
+		should('convert to the correct RGB', nocturne.anim.parseColor('#ff00ff').toString()
+		).equals('rgb(255, 0, 255)');
+	});
+
+	given('a small hex color', function(){
+		should('convert to the correct RGB', nocturne.anim.parseColor('#fff').toString()
+		).equals('rgb(255, 255, 255)');
+	});
+
+	given('An RGB color', function(){
+		should('leave it alone', nocturne.anim.parseColor('rgb(255, 255, 255)').toString()
+		).equals('rgb(255, 255, 255)');
 	});
 });
 
