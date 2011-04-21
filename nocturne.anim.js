@@ -2,9 +2,16 @@
   var anim = {},
       easing = {},
 	  Chainer,
-      opacityType = (typeof document.body.style.opacity !== 'undefined') ? 'opacity' : 'filter';
+      opacityType = (typeof document.body.style.opacity !== 'undefined') ? 'opacity' : 'filter',
+	  CSSTransitions = {};
 
   // These CSS related functions should be moved into nocturne.css
+  function camelize(property){
+	  return property.replace(/-+(.)?/g, function(match, chr){
+		  return chr ? chr.toUpperCase() : '';
+	  });
+  }
+
   function Color(value) {
     this.r = 0;
     this.g = 0;
@@ -184,7 +191,13 @@
         properties[property] = parseCSSValue(properties[property], element, property);
         if (property == 'opacity' && opacityType == 'filter') {
           element.style.zoom = 1;
-        }
+		}else if (CSSTransitions.vendorPrefix && property == 'left' || property == 'top'){
+			CSSTransitions.start(element, duration, property, properties[property].value + properties[property].units, options.easing);
+			setTimeout(function(){
+				CSSTransitions.end(element, property);
+			}, duration);
+			return;
+		}
       }
     }
 
@@ -205,6 +218,74 @@
       }
     }, 10);
   };
+
+  CSSTransitions = {
+	  //CSS3 vendor detection
+	  vendors: {
+		  //Opera Presto 2.3
+		  'opera': {
+			  'prefix': '-o-',
+			  'detector': function(){
+				  try{
+					  document.createEvent('OTransitionEvent');
+					  return true;
+				  }catch(e){
+					  return false;
+				  }
+			  }
+		  },
+
+		  //Chrome, Safari
+		  'webkit': {
+			  'prefix': '-webkit-',
+			  'detector': function(){
+				  try{
+					  document.createEvent('WebKitTransitionEvent');
+					  return true;
+				  }catch(e){
+					  return false;
+				  }
+			  }
+		  },
+
+		  //Firefox
+		  'firefox': {
+			  'prefix': '-moz-',
+			  'detector': function(){
+				  var div = document.createElement('div'),
+				  	supported = false;
+				  if (typeof div.style.MozTransition !== 'undefined'){
+					  supported = true;
+				  }
+				  div = null;
+				  return supported;
+			  }
+		  }
+	  },
+
+	  findCSS3VendorPrefix: function(){
+		  for (var detector in CSSTransitions.vendors){
+			  detector = this.vendors[detector];
+			  if (detector['detector']()){
+				  return detector['prefix'];
+			  }
+		  }
+	  },
+
+	  vendorPrefix: null,
+
+	  //CSS3 Transitions
+	  start: function(element, duration, property, value, easing){
+		  element.style[camelize(this.vendorPrefix + 'transition')] = property + ' ' + duration + 'ms ' + (easing || 'linear');
+		  element.style[property] = value;
+	  },
+
+	  end: function(element, property){
+		  element.style[camelize(this.vendorPrefix + 'transition')] = null;
+	  }
+  };
+
+  CSSTransitions.vendorPrefix = CSSTransitions.findCSS3VendorPrefix();
 
   // Helpers
   anim.fade = function(element, duration, options, easing) {
@@ -250,7 +331,7 @@
   };
 
   anim.move = function(element, duration, options){
-	  return anim.animate(element, duration, {'left': options.x, 'top': options.y, 'easing': options.easing || easing.sine});
+	  return anim.animate(element, duration, {'left': options.x, 'top': options.y}, {'easing': options.easing || easing.sine});
   };
 
   anim.parseColor = function(colorString){
@@ -273,6 +354,9 @@
 		  Chainer.prototype[methodName] = function(){
 			  var args = Array.prototype.slice.call(arguments);
 			  args.unshift(this.element);
+
+			  //Note: the duration needs to be communicated another way
+			  //because of defaults (like highlight())
 			  this.position += args[1] || 0;
 			  setTimeout(function(){
 				  method.apply(null, args);
