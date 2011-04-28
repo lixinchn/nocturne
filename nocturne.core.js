@@ -1,9 +1,11 @@
 (function(global){
-	var nocturne = {
-		VERSION: '0.0.12',
-		lesson: 'Part 12: DOM Ready',
-		alias: '$n'
-	};
+	function nocturne(){
+		return nocturne.init.apply(nocturne, arguments);
+	}
+
+	nocturne.VERSION = '0.0.13';
+	nocturne.lesson = 'Part 13: Chaining';
+	nocturne.alis = '$t';
 
 	nocturne.isArray = Array.isArray || function(object){
 		return !!(object && object.concat && object.unshift && !object.callee);
@@ -25,6 +27,8 @@
 	nocturne.exportAlias = function(aliasName, method){
 		global[aliasName] = method();
 	};
+
+	nocturne.init = function(){};
 
 	if (global.nocturne){
 		throw new Error('nocturne has already been defined');

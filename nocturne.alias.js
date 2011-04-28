@@ -1,7 +1,7 @@
 (function(){
 	nocturne.aliasFramework = function(){
 		var alias = function(){
-			return nocturne.dom.get(arguments[0]);
+			return nocturne(arguments[0]);
 		}
 
 		if (nocturne.enumerable){

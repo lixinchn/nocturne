@@ -1,6 +1,7 @@
 load('riot.js');
 Riot.require('../nocturne.core.js');
 Riot.require('../nocturne.dom.js');
+Riot.require('../nocturne.alias.js');
 
 Riot.context('nocturne.dom.js', function(){
 	given('a selector to tokenize', function(){
@@ -22,6 +23,10 @@ Riot.context('nocturne.dom.js', function(){
 
 	given('a selector that does not match anything', function(){
 		should('not find anything', nocturne.dom.get('div#massive-explosion .failEarly p.lease')).equals([]);
+	});
+
+	given('chained DOM calls', function(){
+		should('find a nested tag', nocturne('.example3').find('p').length).equals(1);
 	});
 });
 

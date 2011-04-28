@@ -86,10 +86,12 @@
 
 	find = {
 		byId: function(root, id){
+			if (root === null) return [];
 			return [root.getElementById(id)];
 		},
 
 		byNodeName: function(root, tagName){
+			if (root === null) return [];
 			var i, results = [], nodes = root.getElementsByTagName(tagName);
 			for (i = 0; i < nodes.length; i++){
 				results.push(nodes[i]);
@@ -98,6 +100,7 @@
 		},
 
 		byClassName: function(root, className){
+			if (root === null) return [];
 			var i, results = [], nodes = root.getElementsByTagName('*');
 			for (i = 0; i < nodes.length; i++){
 				if (nodes[i].className.match('\\b' + className + '\\b')){
@@ -314,10 +317,67 @@
 	dom.get = function(selector){
 		//you give id or class etc. Search will give you dom elements you specified.
 		var tokens = dom.tokenize(selector).tokens,
-			searcher = new Searcher(document, tokens);
+			root = typeof arguments[1] === 'undefined' ? document : arguments[1],
+			searcher = new Searcher(root, tokens);
 
 		return searcher.parse();
 	};
+
+
+	//Chained calls
+	nocturne.init = function(selector){
+		return new nocturne.domChain.init(selector);
+	};
+
+	nocturne.domChain = {
+		init: function(selector){
+			this.selector = selector;
+			this.length = 0;
+			this.prevObject = null;
+			this.elements = [];
+
+			if (!selector){
+				return this;
+			}else {
+				return this.find(selector);
+			}
+		},
+
+		writeElements: function(){
+			for (var i = 0; i < this.elements.length; i++){
+				this[i] = this.elements[i];
+			}
+		},
+
+		first: function(){
+			return this.elements.length === 0 ? null : this.elements[0];
+		},
+
+		find: function(selector){
+			var elements = [],
+				ret = nocturne(),
+				root = document;
+
+			if (this.prevObject){
+				if (this.prevObject.elements.length > 0){
+					root = this.prevObject.elements[0];
+				}else {
+					root = null;
+				}
+			}
+
+			elements = dom.get(selector, root);
+			this.elements = elements;
+			ret.elements = elements;
+			ret.selector = selector;
+			ret.length = elements.length;
+			ret.prevObject = this;
+			ret.writeElements();
+			return ret;
+		}
+	};
+
+	nocturne.domChain.init.prototype = nocturne.domChain;
 
 	nocturne.dom = dom;
 })();
