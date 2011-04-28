@@ -22,6 +22,10 @@
 		};
 	};
 
+	nocturne.exportAlias = function(aliasName, method){
+		global[aliasName] = method();
+	};
+
 	if (global.nocturne){
 		throw new Error('nocturne has already been defined');
 	}else {

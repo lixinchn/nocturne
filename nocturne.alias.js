@@ -21,5 +21,5 @@
 		return alias;
 	};
 
-	eval(nocturne.alias + ' = nocturne.aliasFramework()');
+	nocturne.exportAlias(nocturne.alias, nocturne.aliasFramework);
 })();
