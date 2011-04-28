@@ -220,6 +220,20 @@
 		readyCallbacks.push(callback);
 	};
 
+	events.addDOMMethods = function(){
+		if (typeof nocturne.domChain === 'undefined') return;
+
+		nocturne.domChain.bind = function(type, handler){
+			var element = this.first();
+			if (element){
+				nocturne.events.add(element, type, handler);
+				return this;
+			}
+		};
+	};
+	
+	events.addDOMMethods();
+
 	nocturne.events = events;
 
 	if (typeof window !== 'undefined' && window.attachEvent && !window.addEventListener){

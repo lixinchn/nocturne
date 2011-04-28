@@ -20,6 +20,15 @@ Riot.context('nocturne.events.js', function(){
 			return check;
 		}).equals(1);
 
+		should('bind events using the chained API', function(){
+			var clicks = 0;
+			nocturne('#events-test a').bind('click', function(){
+				clicks++;
+			});
+			nocturne.events.fire(element, 'click');
+			return clicks;
+		}).equals(1);
+
 		should('remove onclick', function(){
 			check = 0;
 			nocturne.events.add(element, 'click', callback);
