@@ -1,7 +1,7 @@
 (function(global){
 	var nocturne = {
-		VERSION: '0.0.11',
-		lesson: 'Part 11: Touch',
+		VERSION: '0.0.12',
+		lesson: 'Part 12: DOM Ready',
 		alias: '$n'
 	};
 
