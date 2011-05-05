@@ -4,6 +4,23 @@ Riot.require('../nocturne.dom.js');
 Riot.require('../nocturne.events.js');
 
 Riot.context('nocturne.events.js', function(){
+	given('a delegate handler', function(){
+		var clicks = 0;
+		nocturne.events.delegate(document, '#events-test a', 'click', function(e){
+			clicks++;
+		});
+
+		should('run the handler when the right selector is matched', function(){
+			nocturne.events.fire(nocturne.dom.get('#events-test a')[0], 'click');
+			return clicks;
+		}).equals(1);
+
+		should('only run when expected', function(){
+			nocturne.events.fire(nocturne.dom.get('p')[0], 'click');
+			return clicks;
+		}).equals(1);
+	});
+
 	given('an element', function(){
 		var element = nocturne.dom.get('#events-test a')[0],
 			check = 0,

@@ -210,18 +210,18 @@
 
 	Searcher.prototype.matchesAllRules = function(element){
 		var tokens = this.tokens.slice(), token = tokens.pop(),
-			ancestor = element.parentNode, matchFound = false;
+			matchFound = false;
 
-		if (!token || !ancestor){
+		if (!token || !element){
 			return false;
 		}
 
-		while(ancestor && token){
-			if (this.matchesToken(ancestor, token)){
+		while(element && token){
+			if (this.matchesToken(element, token)){
 				matchFound = true;
 				token = tokens.pop();
 			}
-			ancestor = ancestor.parentNode;
+			element = element.parentNode;
 		}
 
 		return matchFound && tokens.length === 0;
@@ -235,7 +235,7 @@
 		for (i = 0; i < elements.length; i++){
 			element = elements[i];
 			if (this.tokens.length > 0){
-				if (this.matchesAllRules(element)){
+				if (this.matchesAllRules(element.parentNode)){
 					results.push(element);
 				}
 			}else {
@@ -321,6 +321,20 @@
 			searcher = new Searcher(root, tokens);
 
 		return searcher.parse();
+	};
+
+	//Does an element satify a selector, based on root element
+	dom.findElement = function(element, selector, root){
+		var tokens = dom.tokenize(selector).tokens,
+			searcher = new Searcher(root, []);
+
+		searcher.tokens = tokens;
+		while(element){
+			if (searcher.matchesAllRules(element)){
+				return element;
+			}
+			element = element.parentNode;
+		}
 	};
 
 

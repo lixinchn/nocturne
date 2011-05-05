@@ -220,6 +220,17 @@
 		readyCallbacks.push(callback);
 	};
 
+	if (nocturne.dom !== 'undefined'){
+		events.delegate = function(element, selector, type, handler){
+			return events.add(element, type, function(event){
+				var matches = nocturne.dom.findElement(event.target, selector, event.currentTarget);
+				if (matches){
+					handler(event);
+				}
+			});
+		};
+	}
+
 	events.addDOMMethods = function(){
 		if (typeof nocturne.domChain === 'undefined') return;
 
