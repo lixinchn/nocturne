@@ -1,9 +1,11 @@
 (function(global){
-	var nocturne = {
-		VERSION: '0.0.12',
-		lesson: 'Part 12: DOM Ready',
-		alias: '$n'
-	};
+	function nocturne(){
+		return nocturne.init.apply(nocturne, arguments);
+	}
+
+	nocturne.VERSION = '0.0.13';
+	nocturne.lesson = 'Part 13: Chaining';
+	nocturne.alis = '$t';
 
 	nocturne.isArray = Array.isArray || function(object){
 		return !!(object && object.concat && object.unshift && !object.callee);
@@ -25,6 +27,8 @@
 	nocturne.exportAlias = function(aliasName, method){
 		global[aliasName] = method();
 	};
+
+	nocturne.init = function(){};
 
 	if (global.nocturne){
 		throw new Error('nocturne has already been defined');
@@ -389,10 +393,12 @@ nocturne.functional = {
 
 	find = {
 		byId: function(root, id){
+			if (root === null) return [];
 			return [root.getElementById(id)];
 		},
 
 		byNodeName: function(root, tagName){
+			if (root === null) return [];
 			var i, results = [], nodes = root.getElementsByTagName(tagName);
 			for (i = 0; i < nodes.length; i++){
 				results.push(nodes[i]);
@@ -401,6 +407,7 @@ nocturne.functional = {
 		},
 
 		byClassName: function(root, className){
+			if (root === null) return [];
 			var i, results = [], nodes = root.getElementsByTagName('*');
 			for (i = 0; i < nodes.length; i++){
 				if (nodes[i].className.match('\\b' + className + '\\b')){
@@ -510,18 +517,18 @@ nocturne.functional = {
 
 	Searcher.prototype.matchesAllRules = function(element){
 		var tokens = this.tokens.slice(), token = tokens.pop(),
-			ancestor = element.parentNode, matchFound = false;
+			matchFound = false;
 
-		if (!token || !ancestor){
+		if (!token || !element){
 			return false;
 		}
 
-		while(ancestor && token){
-			if (this.matchesToken(ancestor, token)){
+		while(element && token){
+			if (this.matchesToken(element, token)){
 				matchFound = true;
 				token = tokens.pop();
 			}
-			ancestor = ancestor.parentNode;
+			element = element.parentNode;
 		}
 
 		return matchFound && tokens.length === 0;
@@ -535,7 +542,7 @@ nocturne.functional = {
 		for (i = 0; i < elements.length; i++){
 			element = elements[i];
 			if (this.tokens.length > 0){
-				if (this.matchesAllRules(element)){
+				if (this.matchesAllRules(element.parentNode)){
 					results.push(element);
 				}
 			}else {
@@ -617,10 +624,81 @@ nocturne.functional = {
 	dom.get = function(selector){
 		//you give id or class etc. Search will give you dom elements you specified.
 		var tokens = dom.tokenize(selector).tokens,
-			searcher = new Searcher(document, tokens);
+			root = typeof arguments[1] === 'undefined' ? document : arguments[1],
+			searcher = new Searcher(root, tokens);
 
 		return searcher.parse();
 	};
+
+	//Does an element satify a selector, based on root element
+	dom.findElement = function(element, selector, root){
+		var tokens = dom.tokenize(selector).tokens,
+			searcher = new Searcher(root, []);
+
+		searcher.tokens = tokens;
+		while(element){
+			if (searcher.matchesAllRules(element)){
+				return element;
+			}
+			element = element.parentNode;
+		}
+	};
+
+
+	//Chained calls
+	nocturne.init = function(selector){
+		return new nocturne.domChain.init(selector);
+	};
+
+	nocturne.domChain = {
+		init: function(selector){
+			this.selector = selector;
+			this.length = 0;
+			this.prevObject = null;
+			this.elements = [];
+
+			if (!selector){
+				return this;
+			}else {
+				return this.find(selector);
+			}
+		},
+
+		writeElements: function(){
+			for (var i = 0; i < this.elements.length; i++){
+				this[i] = this.elements[i];
+			}
+		},
+
+		first: function(){
+			return this.elements.length === 0 ? null : this.elements[0];
+		},
+
+		find: function(selector){
+			var elements = [],
+				ret = nocturne(),
+				root = document;
+
+			if (this.prevObject){
+				if (this.prevObject.elements.length > 0){
+					root = this.prevObject.elements[0];
+				}else {
+					root = null;
+				}
+			}
+
+			elements = dom.get(selector, root);
+			this.elements = elements;
+			ret.elements = elements;
+			ret.selector = selector;
+			ret.length = elements.length;
+			ret.prevObject = this;
+			ret.writeElements();
+			return ret;
+		}
+	};
+
+	nocturne.domChain.init.prototype = nocturne.domChain;
 
 	nocturne.dom = dom;
 })();
@@ -846,6 +924,31 @@ nocturne.functional = {
 		readyCallbacks.push(callback);
 	};
 
+	if (nocturne.dom !== 'undefined'){
+		events.delegate = function(element, selector, type, handler){
+			return events.add(element, type, function(event){
+				var matches = nocturne.dom.findElement(event.target, selector, event.currentTarget);
+				if (matches){
+					handler(event);
+				}
+			});
+		};
+	}
+
+	events.addDOMMethods = function(){
+		if (typeof nocturne.domChain === 'undefined') return;
+
+		nocturne.domChain.bind = function(type, handler){
+			var element = this.first();
+			if (element){
+				nocturne.events.add(element, type, handler);
+				return this;
+			}
+		};
+	};
+	
+	events.addDOMMethods();
+
 	nocturne.events = events;
 
 	if (typeof window !== 'undefined' && window.attachEvent && !window.addEventListener){
@@ -861,9 +964,81 @@ nocturne.functional = {
 	}
 })();
 (function(){
+	var touch = {}, state = {};
+
+	touch.swipeThreshold = 50;
+
+	//Returns [orientation angle, orientation string]
+	touch.orientation = function(){
+		var orientation = window.orientation,
+			orientationString = '';
+
+		switch (orientation){
+			case 0:
+				orientationString += 'portrait';
+			break;
+
+			case -90:
+				orientationString += 'landscape rigth';
+			break;
+			
+			case 90:
+				orientationString += 'landscape left';
+			break;
+			
+			case 180:
+				orientationString += 'portrait upside-down';
+			break;
+		}
+		return [orientation, orientationString];
+	};
+
+	function touchStart(e){
+		state.touches = e.touches;
+		state.startTime = (new Date).getTime();
+		state.x = e.changedTouches[0].clientX;
+		state.y = e.changedTouches[0].clientY;
+		state.startX = state.x;
+		state.startY = state.y;
+		state.target = e.target;
+		state.duration = 0;
+	}
+
+	function touchEnd(e){
+		var x = e.changedTouches[0].clientX,
+			y = e.changedTouches[0].clientY;
+
+		if (state.x === x && state.y === y && state.touches.length == 1){
+			nocturne.events.fire(e.target, 'tap');
+		}
+	}
+
+	function touchMove(e){
+		var moved = 0, touch = e.changedTouches[0];
+		state.duration = (new Date).getTime() - state.startTime;
+		state.x = state.startX - touch.pageX;
+		state.y = state.startY - touch.pageY;
+		moved = Math.sqrt(Math.pow(Math.abs(state.x), 2) + Math.pow(Math.abs(state.y), 2));
+		
+		if (state.duration < 1000 && moved > nocturne.touch.swipeThreshold){
+			nocturne.events.fire(e.target, 'swipe');
+		}
+	}
+
+	//register must be called to register for touch event helpers
+	touch.register = function(){
+		nocturne.events.add(document, 'touchstart', touchStart);
+		nocturne.events.add(document, 'touchmove', touchMove);
+		nocturne.events.add(document, 'touchend', touchEnd);
+		nocturne.touch.swipeThreshold = screen.width / 5;
+	};
+
+	nocturne.touch = touch;
+})();
+(function(){
 	nocturne.aliasFramework = function(){
 		var alias = function(){
-			return nocturne.dom.get(arguments[0]);
+			return nocturne(arguments[0]);
 		}
 
 		if (nocturne.enumerable){
