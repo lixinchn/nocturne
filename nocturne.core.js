@@ -3,12 +3,20 @@
 		return nocturne.init.apply(nocturne, arguments);
 	}
 
-	nocturne.VERSION = '0.0.13';
-	nocturne.lesson = 'Part 13: Chaining';
+	nocturne.VERSION = '0.0.14';
+	nocturne.lesson = 'Part 14: NodeList, Collections and Arrays';
 	nocturne.alis = '$t';
 
 	nocturne.isArray = Array.isArray || function(object){
 		return !!(object && object.concat && object.unshift && !object.callee);
+	};
+
+	nocturne.toArray = function(collection){
+		var results = [];
+		for (var i = 0; i < collection.length; i++){
+			results.push(collection[i]);
+		}
+		return results;
 	};
 
 	nocturne.isNumber = function(object){

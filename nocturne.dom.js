@@ -339,8 +339,8 @@
 
 	dom.get = function(selector){
 		var root = typeof arguments[1] === 'undefined' ? document : arguments[1];
-		return nocturne.detect('querySelectorAll') ?
-			root.querySelectorAll(selector) : get(selector, root);
+		return nocturne.toArray(nocturne.detect('querySelectorAll') ?
+			root.querySelectorAll(selector) : get(selector, root));
 	};
 
 	//Does an element satify a selector, based on root element
