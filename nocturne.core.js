@@ -3,8 +3,8 @@
 		return nocturne.init.apply(nocturne, arguments);
 	}
 
-	nocturne.VERSION = '0.0.14';
-	nocturne.lesson = 'Part 14: NodeList, Collections and Arrays';
+	nocturne.VERSION = '0.0.15';
+	nocturne.lesson = 'Part 15: More on chained Events';
 	nocturne.alis = '$t';
 
 	nocturne.isArray = Array.isArray || function(object){

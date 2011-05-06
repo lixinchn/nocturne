@@ -236,11 +236,27 @@
 
 		nocturne.domChain.bind = function(type, handler){
 			var element = this.first();
-			if (element){
-				nocturne.events.add(element, type, handler);
-				return this;
+			for (var i = 0; i < this.length; i++){
+				element = this[i];
+				if (handler){
+					nocturne.events.add(element, type, handler);
+				}else {
+					nocturne.events.fire(element, type);
+				}
 			}
+			return this;
 		};
+
+		var chainedAliases = ('click dblclick mouseover mouseout mousemove ' + 
+								'mousedown mouseup blur focus change keydown ' +
+								'keypress keyup resize scroll').split(' ');
+		for (var i = 0; i < chainedAliases.length; i++){
+			(function(name){
+				nocturne.domChain[name] = function(handler){
+					return this.bind(name, handler);
+				};
+			})(chainedAliases[i]);
+		}
 	};
 	
 	events.addDOMMethods();
