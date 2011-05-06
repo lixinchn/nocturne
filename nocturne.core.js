@@ -30,6 +30,22 @@
 
 	nocturne.init = function(){};
 
+	var testCache = {},
+		detectionTests = {};
+
+	nocturne.addDetectionTest = function(name, fn){
+		if (!detectionTests[name]){
+			detectionTests[name] = fn;
+		}
+	};
+
+	nocturne.detect = function(testName){
+		if (typeof testCache[testCache] === 'undefined'){
+			testCache[testName] = detectionTests[testName]();
+		}
+		return testCache[testName];
+	};
+
 	if (global.nocturne){
 		throw new Error('nocturne has already been defined');
 	}else {

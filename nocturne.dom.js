@@ -314,13 +314,33 @@
 		return tokenizer;
 	};
 
-	dom.get = function(selector){
+	function get(selector, root){
 		//you give id or class etc. Search will give you dom elements you specified.
 		var tokens = dom.tokenize(selector).tokens,
-			root = typeof arguments[1] === 'undefined' ? document : arguments[1],
 			searcher = new Searcher(root, tokens);
 
 		return searcher.parse();
+	};
+
+	nocturne.addDetectionTest('querySelectorAll', function(){
+		var div = document.createElement('div');
+		div.innerHTML = '<p class="TEST"></p>';
+
+		//Some versions of Safari can't handle uppercase in quirks mode
+		if (div.querySelectorAll){
+			if (div.querySelectorAll('.TEST').length === 0) return false;
+			return true;
+		}
+
+		//Helps IE release memory associated with the div
+		div = null;
+		return false;
+	});
+
+	dom.get = function(selector){
+		var root = typeof arguments[1] === 'undefined' ? document : arguments[1];
+		return nocturne.detect('querySelectorAll') ?
+			root.querySelectorAll(selector) : get(selector, root);
 	};
 
 	//Does an element satify a selector, based on root element
